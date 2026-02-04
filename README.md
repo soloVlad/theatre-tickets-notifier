@@ -43,6 +43,22 @@ pnpm build
 pnpm start
 ```
 
+### Docker
+
+- **Build**
+
+```bash
+docker build -t theatre-tickets-notifier .
+```
+
+- **Run (recommended: pass env via file)**
+
+Make sure you have a local `.env` file with `TELEGRAM_BOT_TOKEN=...` and then:
+
+```bash
+docker run --rm --env-file .env theatre-tickets-notifier
+```
+
 ### Using the bot
 
 - **Start notifications**: In Telegram, start a chat with your bot and send `/start`.  
