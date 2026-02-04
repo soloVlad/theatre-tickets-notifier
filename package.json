@@ -2,6 +2,7 @@
   "name": "theatre-tickets-notifier",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@9.0.0",
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",

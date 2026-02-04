@@ -13,7 +13,7 @@ A simple Telegram bot (Node.js + TypeScript) that notifies you when new tickets 
 - **1. Install dependencies**
 
 ```bash
-npm install
+pnpm install
 ```
 
 - **2. Create your `.env` file**
@@ -33,14 +33,14 @@ Edit `src/checkTickets.ts` and replace the placeholder implementation of `checkT
 - **4. Run the bot in development**
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Or build and run:
 
 ```bash
-npm run build
-npm start
+pnpm build
+pnpm start
 ```
 
 ### Using the bot
