@@ -37,8 +37,6 @@ bot.command("status", (ctx) => {
 });
 
 async function runPeriodicCheck() {
-  console.log('here');
-
   if (subscribedChatIds.size === 0) {
     return;
   }
@@ -47,7 +45,6 @@ async function runPeriodicCheck() {
     for (const chatId of subscribedChatIds) {
       await bot.telegram.sendMessage(chatId, "Test message");
     }
-
 
     const available = await checkTicketsAvailable();
     if (!available) return;
@@ -74,8 +71,14 @@ async function main() {
     setInterval(runPeriodicCheck, intervalMs);
   
     // Enable graceful stop
-    process.once("SIGINT", () => bot.stop("SIGINT"));
-    process.once("SIGTERM", () => bot.stop("SIGTERM"));
+    process.once("SIGINT", () => {
+      bot.stop("SIGINT");
+      process.exit(0);
+    });
+    process.once("SIGTERM", () => {
+      bot.stop("SIGTERM");
+      process.exit(0);
+    });
   });
 }
 
