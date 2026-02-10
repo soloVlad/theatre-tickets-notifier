@@ -13,9 +13,9 @@ bot.start((ctx) => {
   subscribedChatIds.add(chatId);
 
   ctx.reply(
-    "🎭 Theatre tickets notifier is now active for this chat.\n" +
-      "I'll check for new tickets periodically and send you a message if they appear.\n\n" +
-      `Current check interval: ${CHECK_INTERVAL_MINUTES} minute(s).`
+    `🎭 Theatre tickets notifier is now active for this chat.
+I'll check for new tickets periodically and send you a message if they appear.
+Current check interval: ${CHECK_INTERVAL_MINUTES} minute(s).`,
   );
 });
 
@@ -31,8 +31,8 @@ bot.command("status", (ctx) => {
   ctx.reply(
     [
       `Subscription status: ${isSubscribed ? "active ✅" : "inactive ❌"}`,
-      `Check interval: ${CHECK_INTERVAL_MINUTES} minute(s)`
-    ].join("\n")
+      `Check interval: ${CHECK_INTERVAL_MINUTES} minute(s)`,
+    ].join("\n"),
   );
 });
 
@@ -49,8 +49,7 @@ async function runPeriodicCheck() {
     const available = await checkTicketsAvailable();
     if (!available) return;
 
-    const message =
-      "🎟 Tickets are now available! Go check the site to purchase them.";
+    const message = "🎟 Tickets are now available! Go check the site to purchase them.";
 
     for (const chatId of subscribedChatIds) {
       await bot.telegram.sendMessage(chatId, message);
@@ -63,13 +62,11 @@ async function runPeriodicCheck() {
 async function main() {
   bot.launch(() => {
     console.log("Telegram bot started.");
-    console.log(
-      `Checking for ticket availability every ${CHECK_INTERVAL_MINUTES} minute(s).`
-    );
-  
+    console.log(`Checking for ticket availability every ${CHECK_INTERVAL_MINUTES} minute(s).`);
+
     const intervalMs = CHECK_INTERVAL_MINUTES * 60 * 1000;
     setInterval(runPeriodicCheck, intervalMs);
-  
+
     // Enable graceful stop
     process.once("SIGINT", () => {
       bot.stop("SIGINT");
@@ -86,5 +83,3 @@ main().catch((err) => {
   console.error("Failed to start bot:", err);
   process.exit(1);
 });
-
-

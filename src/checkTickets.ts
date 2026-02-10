@@ -11,5 +11,3 @@ export async function checkTicketsAvailable(): Promise<boolean> {
   // For now it always returns false, so no notifications will be sent.
   return false;
 }
-
-
