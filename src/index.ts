@@ -42,14 +42,18 @@ async function runPeriodicCheck() {
   }
 
   try {
-    for (const chatId of subscribedChatIds) {
-      await bot.telegram.sendMessage(chatId, "Test message");
+    const availableTexts = await checkTicketsAvailable();
+    if (availableTexts.length === 0) {
+      return;
     }
 
-    const available = await checkTicketsAvailable();
-    if (!available) return;
-
-    const message = "🎟 Tickets are now available! Go check the site to purchase them.";
+    const bodyLines = availableTexts.map((text) => `• ${text}`);
+    const message = [
+      "🎟 Обнаружены доступные месяцы для покупки билетов на сайте puppet-minsk.by:",
+      ...bodyLines,
+      "",
+      "Источник: https://puppet-minsk.by/afisha",
+    ].join("\n");
 
     for (const chatId of subscribedChatIds) {
       await bot.telegram.sendMessage(chatId, message);
