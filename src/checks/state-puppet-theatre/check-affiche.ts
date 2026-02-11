@@ -1,4 +1,4 @@
-const AFISHA_URL = "https://puppet-minsk.by/afisha";
+import { AFISHA_URL } from "./constants";
 
 /**
  * Fetches the theatre schedule page and extracts the visible text content
@@ -7,7 +7,7 @@ const AFISHA_URL = "https://puppet-minsk.by/afisha";
  * For now, this function is used to build a message for the Telegram bot,
  * not to make a strict boolean "available / not available" decision.
  */
-export async function checkTicketsAvailable(): Promise<string[]> {
+export async function checkAffiche(): Promise<string[]> {
   const response = await fetch(AFISHA_URL, {
     headers: {
       // Some sites behave differently without a User-Agent; set a reasonable one.

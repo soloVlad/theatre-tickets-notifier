@@ -1,0 +1,1 @@
+export const DEFAULT_CHECK_INTERVAL_MINUTES = 30;
