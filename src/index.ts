@@ -1,47 +1,52 @@
 import { Telegraf } from "telegraf";
 import { TELEGRAM_BOT_TOKEN, CHECK_INTERVAL_MINUTES } from "./config";
 import { checkTicketsAvailable } from "./checkTickets";
-
-// In-memory storage of chat IDs that requested notifications.
-// For a real deployment, you may want to persist this in a database.
-const subscribedChatIds = new Set<number>();
+import {
+  addSubscription,
+  getAllSubscriptions,
+  isSubscribed,
+  removeSubscription,
+  ensureSchema,
+  closePool,
+} from "./db";
 
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
 
-bot.start((ctx) => {
+bot.start(async (ctx) => {
   const chatId = ctx.chat.id;
-  subscribedChatIds.add(chatId);
+  await addSubscription(chatId);
 
-  ctx.reply(
+  await ctx.reply(
     `🎭 Theatre tickets notifier is now active for this chat.
 I'll check for new tickets periodically and send you a message if they appear.
 Current check interval: ${CHECK_INTERVAL_MINUTES} minute(s).`,
   );
 });
 
-bot.command("stop", (ctx) => {
+bot.command("stop", async (ctx) => {
   const chatId = ctx.chat.id;
-  subscribedChatIds.delete(chatId);
-  ctx.reply("You will no longer receive ticket notifications in this chat.");
+  await removeSubscription(chatId);
+  await ctx.reply("You will no longer receive ticket notifications in this chat.");
 });
 
-bot.command("status", (ctx) => {
+bot.command("status", async (ctx) => {
   const chatId = ctx.chat.id;
-  const isSubscribed = subscribedChatIds.has(chatId);
-  ctx.reply(
+  const subscribed = await isSubscribed(chatId);
+  await ctx.reply(
     [
-      `Subscription status: ${isSubscribed ? "active ✅" : "inactive ❌"}`,
+      `Subscription status: ${subscribed ? "active ✅" : "inactive ❌"}`,
       `Check interval: ${CHECK_INTERVAL_MINUTES} minute(s)`,
     ].join("\n"),
   );
 });
 
 async function runPeriodicCheck() {
-  if (subscribedChatIds.size === 0) {
-    return;
-  }
-
   try {
+    const subscribedChatIds = await getAllSubscriptions();
+    if (subscribedChatIds.length === 0) {
+      return;
+    }
+
     const availableTexts = await checkTicketsAvailable();
     if (availableTexts.length === 0) {
       return;
@@ -64,6 +69,8 @@ async function runPeriodicCheck() {
 }
 
 async function main() {
+  await ensureSchema();
+
   bot.launch(() => {
     console.log("Telegram bot started.");
     console.log(`Checking for ticket availability every ${CHECK_INTERVAL_MINUTES} minute(s).`);
@@ -72,11 +79,13 @@ async function main() {
     setInterval(runPeriodicCheck, intervalMs);
 
     // Enable graceful stop
-    process.once("SIGINT", () => {
+    process.once("SIGINT", async () => {
+      await closePool();
       bot.stop("SIGINT");
       process.exit(0);
     });
-    process.once("SIGTERM", () => {
+    process.once("SIGTERM", async () => {
+      await closePool();
       bot.stop("SIGTERM");
       process.exit(0);
     });

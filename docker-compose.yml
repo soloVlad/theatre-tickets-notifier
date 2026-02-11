@@ -1,0 +1,30 @@
+  services:
+    db:
+      image: postgres:16
+      container_name: theatre-bot-db
+      restart: unless-stopped
+      environment:
+        POSTGRES_USER: theatre
+        POSTGRES_PASSWORD: theatre_password
+        POSTGRES_DB: theatre_bot
+      volumes:
+        - db_data:/var/lib/postgresql/data
+      ports:
+        - "8081:5432"
+
+    bot:
+      build: .
+      image: theatre-tickets-notifier
+      container_name: theatre-bot
+      restart: unless-stopped
+      env_file:
+        - .env
+      environment:
+        DATABASE_URL: postgres://theatre:theatre_password@db:5432/theatre_bot
+      depends_on:
+        - db
+
+  volumes:
+    db_data:
+
+

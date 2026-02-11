@@ -24,6 +24,7 @@ Create a file named `.env` in the project root:
 TELEGRAM_BOT_TOKEN=your-telegram-bot-token-here
 # Optional: override default 30-minute interval between checks
 # CHECK_INTERVAL_MINUTES=30
+# DATABASE_URL=postgres://theatre:theatre_password@localhost:5432/theatre_bot
 ```
 
 - **3. Implement your ticket check logic**
@@ -58,6 +59,19 @@ Make sure you have a local `.env` file with `TELEGRAM_BOT_TOKEN=...` and then:
 ```bash
 docker run --rm --env-file .env theatre-tickets-notifier
 ```
+
+### Docker Compose (bot + Postgres)
+
+- **Start both services (db + bot)**
+
+```bash
+docker compose up -d --build
+```
+
+This will:
+- start Postgres with a persistent volume
+- build and start the bot image
+- wire them together via the internal `db` hostname
 
 ### Using the bot
 
