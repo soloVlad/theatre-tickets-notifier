@@ -1,20 +1,14 @@
 import { Telegraf } from "telegraf";
 import { TELEGRAM_BOT_TOKEN, CHECK_INTERVAL_MINUTES } from "./config";
 import { checkTicketsAvailable } from "./checkTickets";
-import {
-  addSubscription,
-  getAllSubscriptions,
-  isSubscribed,
-  removeSubscription,
-  ensureSchema,
-  closePool,
-} from "./db";
+import { closePool } from "./db";
+import { subscriptionsDB } from "./db/subscriptions";
 
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
 
 bot.start(async (ctx) => {
   const chatId = ctx.chat.id;
-  await addSubscription(chatId);
+  await subscriptionsDB.add(chatId);
 
   await ctx.reply(
     `🎭 Theatre tickets notifier is now active for this chat.
@@ -25,13 +19,13 @@ Current check interval: ${CHECK_INTERVAL_MINUTES} minute(s).`,
 
 bot.command("stop", async (ctx) => {
   const chatId = ctx.chat.id;
-  await removeSubscription(chatId);
+  await subscriptionsDB.remove(chatId);
   await ctx.reply("You will no longer receive ticket notifications in this chat.");
 });
 
 bot.command("status", async (ctx) => {
   const chatId = ctx.chat.id;
-  const subscribed = await isSubscribed(chatId);
+  const subscribed = await subscriptionsDB.checkIsSubscribed(chatId);
   await ctx.reply(
     [
       `Subscription status: ${subscribed ? "active ✅" : "inactive ❌"}`,
@@ -42,7 +36,7 @@ bot.command("status", async (ctx) => {
 
 async function runPeriodicCheck() {
   try {
-    const subscribedChatIds = await getAllSubscriptions();
+    const subscribedChatIds = await subscriptionsDB.getAll();
     if (subscribedChatIds.length === 0) {
       return;
     }
@@ -69,7 +63,7 @@ async function runPeriodicCheck() {
 }
 
 async function main() {
-  await ensureSchema();
+  await subscriptionsDB.ensureSchema();
 
   bot.launch(() => {
     console.log("Telegram bot started.");

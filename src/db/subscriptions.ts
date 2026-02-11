@@ -1,11 +1,6 @@
-import { Pool } from "pg";
-import { DATABASE_URL } from "./config";
+import { pool } from ".";
 
-const pool = new Pool({
-  connectionString: DATABASE_URL,
-});
-
-export async function ensureSchema(): Promise<void> {
+async function ensureSchema(): Promise<void> {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS chat_subscriptions (
       chat_id BIGINT PRIMARY KEY,
@@ -14,7 +9,7 @@ export async function ensureSchema(): Promise<void> {
   `);
 }
 
-export async function addSubscription(chatId: number): Promise<void> {
+async function add(chatId: number): Promise<void> {
   await pool.query(
     `
       INSERT INTO chat_subscriptions (chat_id)
@@ -25,22 +20,26 @@ export async function addSubscription(chatId: number): Promise<void> {
   );
 }
 
-export async function removeSubscription(chatId: number): Promise<void> {
+async function remove(chatId: number): Promise<void> {
   await pool.query("DELETE FROM chat_subscriptions WHERE chat_id = $1", [chatId]);
 }
 
-export async function isSubscribed(chatId: number): Promise<boolean> {
+async function checkIsSubscribed(chatId: number): Promise<boolean> {
   const result = await pool.query("SELECT 1 FROM chat_subscriptions WHERE chat_id = $1", [chatId]);
   return result.rowCount !== null && result.rowCount > 0;
 }
 
-export async function getAllSubscriptions(): Promise<number[]> {
+async function getAll(): Promise<number[]> {
   const result = await pool.query<{ chat_id: string | number }>(
     "SELECT chat_id FROM chat_subscriptions",
   );
   return result.rows.map((row) => Number(row.chat_id));
 }
 
-export async function closePool(): Promise<void> {
-  await pool.end();
-}
+export const subscriptionsDB = {
+  ensureSchema,
+  add,
+  remove,
+  checkIsSubscribed,
+  getAll,
+};
