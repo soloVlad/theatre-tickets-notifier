@@ -1,0 +1,1 @@
+export { minToMs } from "./minToMs";

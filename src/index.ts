@@ -1,38 +1,9 @@
-import { Telegraf } from "telegraf";
-import { TELEGRAM_BOT_TOKEN, CHECK_INTERVAL_MINUTES } from "./config";
+import { CHECK_INTERVAL_MINUTES } from "./config";
 import { checkTicketsAvailable } from "./checkTickets";
 import { closePool } from "./db";
 import { subscriptionsDB } from "./db/subscriptions";
-
-const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
-
-bot.start(async (ctx) => {
-  const chatId = ctx.chat.id;
-  await subscriptionsDB.add(chatId);
-
-  await ctx.reply(
-    `🎭 Theatre tickets notifier is now active for this chat.
-I'll check for new tickets periodically and send you a message if they appear.
-Current check interval: ${CHECK_INTERVAL_MINUTES} minute(s).`,
-  );
-});
-
-bot.command("stop", async (ctx) => {
-  const chatId = ctx.chat.id;
-  await subscriptionsDB.remove(chatId);
-  await ctx.reply("You will no longer receive ticket notifications in this chat.");
-});
-
-bot.command("status", async (ctx) => {
-  const chatId = ctx.chat.id;
-  const subscribed = await subscriptionsDB.checkIsSubscribed(chatId);
-  await ctx.reply(
-    [
-      `Subscription status: ${subscribed ? "active ✅" : "inactive ❌"}`,
-      `Check interval: ${CHECK_INTERVAL_MINUTES} minute(s)`,
-    ].join("\n"),
-  );
-});
+import { botHandler } from "./bot";
+import { minToMs } from "./util";
 
 async function runPeriodicCheck() {
   try {
@@ -55,7 +26,7 @@ async function runPeriodicCheck() {
     ].join("\n");
 
     for (const chatId of subscribedChatIds) {
-      await bot.telegram.sendMessage(chatId, message);
+      await botHandler.sendMessage(chatId, message);
     }
   } catch (error) {
     console.error("Error while checking tickets or sending notification:", error);
@@ -65,24 +36,20 @@ async function runPeriodicCheck() {
 async function main() {
   await subscriptionsDB.ensureSchema();
 
-  bot.launch(() => {
+  botHandler.launchBot(() => {
     console.log("Telegram bot started.");
     console.log(`Checking for ticket availability every ${CHECK_INTERVAL_MINUTES} minute(s).`);
 
-    const intervalMs = CHECK_INTERVAL_MINUTES * 60 * 1000;
+    const intervalMs = minToMs(CHECK_INTERVAL_MINUTES);
     setInterval(runPeriodicCheck, intervalMs);
 
-    // Enable graceful stop
-    process.once("SIGINT", async () => {
-      await closePool();
-      bot.stop("SIGINT");
-      process.exit(0);
-    });
-    process.once("SIGTERM", async () => {
-      await closePool();
-      bot.stop("SIGTERM");
-      process.exit(0);
-    });
+    for (const signal of ["SIGINT", "SIGTERM"]) {
+      process.once(signal, async () => {
+        await closePool();
+        botHandler.stopBot(signal);
+        process.exit(0);
+      });
+    }
   });
 }
 
