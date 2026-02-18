@@ -1,4 +1,4 @@
-import { AFISHA_URL } from "./constants";
+import { AFFICHE } from "./constants";
 
 /**
  * Fetches the theatre schedule page and extracts the visible text content
@@ -8,7 +8,7 @@ import { AFISHA_URL } from "./constants";
  * not to make a strict boolean "available / not available" decision.
  */
 export async function checkAffiche(): Promise<string[]> {
-  const response = await fetch(AFISHA_URL, {
+  const response = await fetch(AFFICHE, {
     headers: {
       // Some sites behave differently without a User-Agent; set a reasonable one.
       "User-Agent":
@@ -18,7 +18,7 @@ export async function checkAffiche(): Promise<string[]> {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch "${AFISHA_URL}", status ${response.status}`);
+    throw new Error(`Failed to fetch "${AFFICHE}", status ${response.status}`);
   }
 
   const html = await response.text();
