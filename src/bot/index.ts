@@ -9,16 +9,16 @@ bot.start(async (ctx) => {
   await subscriptionsDB.add(chatId);
 
   await ctx.reply(
-    `🎭 Theatre tickets notifier is now active for this chat.
-I'll check for new tickets periodically and send you a message if they appear.
-Current check interval: ${CHECK_INTERVAL_MINUTES} minute(s).`,
+    `🎭 Бот проверки билетов теперь активен.
+Я буду проверять афиши периодически и сообщу Вам, если они появятся.
+Текущий интервал проверок: ${CHECK_INTERVAL_MINUTES} минут.`,
   );
 });
 
 bot.command("stop", async (ctx) => {
   const chatId = ctx.chat.id;
   await subscriptionsDB.remove(chatId);
-  await ctx.reply("You will no longer receive ticket notifications in this chat.");
+  await ctx.reply("Вы больше не будете получать уведомления в этом чате.");
 });
 
 bot.command("status", async (ctx) => {
@@ -26,8 +26,8 @@ bot.command("status", async (ctx) => {
   const subscribed = await subscriptionsDB.checkIsSubscribed(chatId);
   await ctx.reply(
     [
-      `Subscription status: ${subscribed ? "active ✅" : "inactive ❌"}`,
-      `Check interval: ${CHECK_INTERVAL_MINUTES} minute(s)`,
+      `Статус подписки: ${subscribed ? "активна ✅" : "не активна ❌"}`,
+      `Интервал проверок: ${CHECK_INTERVAL_MINUTES} минут`,
     ].join("\n"),
   );
 });
