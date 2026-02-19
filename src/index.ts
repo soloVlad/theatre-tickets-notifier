@@ -1,8 +1,8 @@
 import { closePool } from "./db";
 import { subscriptionsDB } from "./db/subscriptions";
 import { botHandler } from "./bot";
-import { minToMs } from "./util";
-import { checkStatePuppetTheatre } from "./checks/state-puppet-theatre";
+import { createDataFolder, minToMs } from "./util";
+import { checkStatePuppetTheatre } from "./checks";
 import { CHECK_INTERVAL_MINUTES } from "./config";
 
 async function runPeriodicCheck() {
@@ -11,6 +11,7 @@ async function runPeriodicCheck() {
 
 async function main() {
   await subscriptionsDB.ensureSchema();
+  createDataFolder();
 
   botHandler.launchBot(() => {
     console.log("Telegram bot started.");

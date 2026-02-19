@@ -1,6 +1,10 @@
 import { botHandler } from "../../bot";
 import { subscriptionsDB } from "../../db/subscriptions";
+import { getSetDifference } from "../../util";
 import { checkAffiche } from "./check-affiche";
+import { prepareFoundMessage } from "./prepare-found-message";
+import { readSavedAffiche } from "./read-saved-affiche";
+import { saveAffiche } from "./save-affiche";
 
 export async function checkStatePuppetTheatre() {
   try {
@@ -9,21 +13,27 @@ export async function checkStatePuppetTheatre() {
       return;
     }
 
-    const availableTexts = await checkAffiche();
-    if (availableTexts.length === 0) {
+    const availableMonthsSet = await checkAffiche();
+    if (availableMonthsSet.size === 0) {
       return;
     }
 
-    const bodyLines = availableTexts.map((text) => `• ${text}`);
-    const message = [
-      "🎟 Обнаружены доступные месяцы для покупки билетов на сайте puppet-minsk.by:",
-      ...bodyLines,
-      "",
-      "Источник: https://puppet-minsk.by/afisha",
-    ].join("\n");
+    const savedMonths = readSavedAffiche() as string[];
+    const savedMonthsSet = new Set(savedMonths);
+
+    const newMonthsSet = getSetDifference(savedMonthsSet, availableMonthsSet);
+
+    if (!newMonthsSet.size) {
+      return;
+    }
+
+    const newMonths = Array.from(newMonthsSet);
+    saveAffiche(newMonths);
+
+    const foundMessage = prepareFoundMessage(newMonths);
 
     for (const chatId of subscribedChatIds) {
-      await botHandler.sendMessage(chatId, message);
+      await botHandler.sendMessage(chatId, foundMessage);
     }
   } catch (error) {
     console.error(

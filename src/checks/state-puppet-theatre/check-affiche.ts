@@ -1,4 +1,4 @@
-import { AFFICHE } from "./constants";
+import { AFFICHE_URL } from "./constants";
 
 /**
  * Fetches the theatre schedule page and extracts the visible text content
@@ -7,8 +7,8 @@ import { AFFICHE } from "./constants";
  * For now, this function is used to build a message for the Telegram bot,
  * not to make a strict boolean "available / not available" decision.
  */
-export async function checkAffiche(): Promise<string[]> {
-  const response = await fetch(AFFICHE, {
+export async function checkAffiche(): Promise<Set<string>> {
+  const response = await fetch(AFFICHE_URL, {
     headers: {
       // Some sites behave differently without a User-Agent; set a reasonable one.
       "User-Agent":
@@ -18,7 +18,7 @@ export async function checkAffiche(): Promise<string[]> {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch "${AFFICHE}", status ${response.status}`);
+    throw new Error(`Failed to fetch "${AFFICHE_URL}", status ${response.status}`);
   }
 
   const html = await response.text();
@@ -47,8 +47,6 @@ export async function checkAffiche(): Promise<string[]> {
     match = tagWithDataM.exec(html);
   }
 
-  // Deduplicate while preserving order
-  const unique = Array.from(new Set(results));
-
-  return unique;
+  const months = new Set(results);
+  return months;
 }
