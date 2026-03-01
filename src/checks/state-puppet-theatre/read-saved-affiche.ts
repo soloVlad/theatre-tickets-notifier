@@ -1,4 +1,4 @@
-import { readJsonFromFile } from "../../util";
+import { readJsonFromFile } from "@util";
 import { DATA_FILE_NAME } from "./constants";
 
 export function readSavedAffiche() {

@@ -1,9 +1,9 @@
-import { closePool } from "./db";
-import { subscriptionsDB } from "./db/subscriptions";
-import { botHandler } from "./bot";
-import { createDataFolder, minToMs } from "./util";
-import { checkStatePuppetTheatre } from "./checks";
-import { CHECK_INTERVAL_MINUTES } from "./config";
+import { closePool } from "@db";
+import { subscriptionsDB } from "@db/subscriptions";
+import { botHandler } from "@bot";
+import { createDataFolder, minToMs } from "@util";
+import { checkStatePuppetTheatre } from "@checks";
+import { CHECK_INTERVAL_MINUTES } from "@config";
 
 async function runPeriodicCheck() {
   await checkStatePuppetTheatre();

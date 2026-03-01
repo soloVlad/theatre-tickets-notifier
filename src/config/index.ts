@@ -1,6 +1,6 @@
+import dotenv from "dotenv";
 import { DEFAULT_CHECK_INTERVAL_MINUTES } from "./constants";
 import { required } from "./required";
-import dotenv from "dotenv";
 
 dotenv.config();
 

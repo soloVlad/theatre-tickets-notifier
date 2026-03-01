@@ -1,6 +1,6 @@
-import { botHandler } from "../../bot";
-import { subscriptionsDB } from "../../db/subscriptions";
-import { getSetDifference } from "../../util";
+import { botHandler } from "@bot";
+import { subscriptionsDB } from "@db/subscriptions";
+import { getSetDifference } from "@util";
 import { checkAffiche } from "./check-affiche";
 import { prepareFoundMessage } from "./prepare-found-message";
 import { readSavedAffiche } from "./read-saved-affiche";

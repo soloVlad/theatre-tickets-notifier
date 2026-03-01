@@ -1,4 +1,4 @@
-import { readJsonFromFile, writeJsonToFile } from "../../util";
+import { readJsonFromFile, writeJsonToFile } from "@util";
 import { DATA_FILE_NAME } from "./constants";
 
 export function saveAffiche(months: string[]) {

@@ -1,6 +1,6 @@
 import { Telegraf } from "telegraf";
-import { CHECK_INTERVAL_MINUTES, TELEGRAM_BOT_TOKEN } from "../config";
-import { subscriptionsDB } from "../db/subscriptions";
+import { CHECK_INTERVAL_MINUTES, TELEGRAM_BOT_TOKEN } from "@config";
+import { subscriptionsDB } from "@db/subscriptions";
 
 const bot = new Telegraf(TELEGRAM_BOT_TOKEN);
 

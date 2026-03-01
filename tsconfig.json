@@ -10,7 +10,19 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "paths": {
+      "@bot/*": ["./src/bot/*"],
+      "@bot": ["./src/bot/index.ts"],
+      "@checks/*": ["./src/checks/*"],
+      "@checks": ["./src/checks/index.ts"],
+      "@config/*": ["./src/config/*"],
+      "@config": ["./src/config/index.ts"],
+      "@db/*": ["./src/db/*"],
+      "@db": ["./src/db/index.ts"],
+      "@util/*": ["./src/util/*"],
+      "@util": ["./src/util/index.ts"],
+    }
   },
   "include": [
     "src"
