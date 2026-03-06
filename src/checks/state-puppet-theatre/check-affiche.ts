@@ -24,7 +24,7 @@ export async function checkAffiche(): Promise<Set<string>> {
   let html = await response.text();
 
   // Remove HTML comments BEFORE parsing
-  html = html.replace(/<!--[\s\S]*?-->/g, '');
+  html = html.replace(/<!--[\s\S]*?-->/g, "");
 
   // Very small HTML parser for this specific case:
   // find tags with a data-m attribute and grab their inner text.

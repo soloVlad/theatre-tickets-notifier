@@ -6,8 +6,8 @@ export function prepareFoundMessage(months: string[]) {
     "🎟 Обнаружены доступные месяцы для покупки билетов в Театр Кукол:",
     ...bodyLines,
     "",
-    `Скорее за покупками: ${AFFICHE_URL}`
-  ].join("\n")
+    `Скорее за покупками: ${AFFICHE_URL}`,
+  ].join("\n");
 
   return message;
 }

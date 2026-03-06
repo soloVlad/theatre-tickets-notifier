@@ -1,1 +1,1 @@
-export { minToMs } from './minToMs'
+export { minToMs } from "./minToMs";

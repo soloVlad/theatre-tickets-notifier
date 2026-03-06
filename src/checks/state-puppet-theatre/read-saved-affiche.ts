@@ -6,6 +6,6 @@ export function readSavedAffiche() {
     const savedAffiche = readJsonFromFile(DATA_FILE_NAME);
     return savedAffiche?.availableMonths;
   } catch {
-    return '';
+    return "";
   }
-} 
+}

@@ -1,1 +1,1 @@
-export { checkStatePuppetTheatre } from './state-puppet-theatre'
+export { checkStatePuppetTheatre } from "./state-puppet-theatre";

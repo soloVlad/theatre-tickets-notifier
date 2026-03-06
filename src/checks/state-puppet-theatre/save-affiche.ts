@@ -5,8 +5,8 @@ export function saveAffiche(months: string[]) {
   try {
     writeJsonToFile(DATA_FILE_NAME, {
       availableMonths: months,
-    })
-  } catch(error) {
-    console.error('Error saving state-puppet-theatre affiche: ', error);
+    });
+  } catch (error) {
+    console.error("Error saving state-puppet-theatre affiche: ", error);
   }
-} 
+}
