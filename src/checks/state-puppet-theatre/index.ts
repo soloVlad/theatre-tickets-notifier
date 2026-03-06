@@ -27,9 +27,10 @@ export async function checkStatePuppetTheatre() {
       return;
     }
 
-    const newMonths = Array.from(newMonthsSet);
-    saveAffiche(newMonths);
+    const availableMonths = Array.from(availableMonthsSet);
+    saveAffiche(availableMonths);
 
+    const newMonths = Array.from(newMonthsSet);
     const foundMessage = prepareFoundMessage(newMonths);
 
     for (const chatId of subscribedChatIds) {
