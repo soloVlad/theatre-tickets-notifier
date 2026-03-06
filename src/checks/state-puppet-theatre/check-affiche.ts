@@ -21,7 +21,10 @@ export async function checkAffiche(): Promise<Set<string>> {
     throw new Error(`Failed to fetch "${AFFICHE_URL}", status ${response.status}`);
   }
 
-  const html = await response.text();
+  let html = await response.text();
+
+  // Remove HTML comments BEFORE parsing
+  html = html.replace(/<!--[\s\S]*?-->/g, '');
 
   // Very small HTML parser for this specific case:
   // find tags with a data-m attribute and grab their inner text.
