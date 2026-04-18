@@ -40,8 +40,16 @@ function stopBot(signal: string) {
   bot.stop(signal);
 }
 
-async function sendMessage(chatId: number, message: string) {
-  await bot.telegram.sendMessage(chatId, message);
+async function sendMessage(
+  chatId: number,
+  message: string,
+  options?: {
+    silent?: boolean;
+  },
+) {
+  await bot.telegram.sendMessage(chatId, message, {
+    disable_notification: options?.silent,
+  });
 }
 
 export const botHandler = {

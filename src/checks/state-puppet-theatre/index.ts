@@ -24,6 +24,14 @@ export async function checkStatePuppetTheatre() {
     const newMonthsSet = getSetDifference(savedMonthsSet, availableMonthsSet);
 
     if (!newMonthsSet.size) {
+      for (const chatId of subscribedChatIds) {
+        await botHandler.sendMessage(
+          chatId,
+          `Новых билетов не обнаружено.\nПрошлая проверка:\n${savedMonths.join("\n")}`,
+          { silent: true },
+        );
+      }
+
       return;
     }
 
