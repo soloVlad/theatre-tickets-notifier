@@ -1,4 +1,4 @@
-import { AFFICHE_URL } from "./constants";
+import { AFFICHE_URLS } from "./constants";
 
 export function prepareFoundMessage(months: string[]) {
   const bodyLines = months.map((month) => `• ${month}`);
@@ -6,7 +6,8 @@ export function prepareFoundMessage(months: string[]) {
     "🎟 Обнаружены доступные месяцы для покупки билетов в Театр Кукол:",
     ...bodyLines,
     "",
-    `Скорее за покупками: ${AFFICHE_URL}`,
+    "Скорее за покупками:",
+    ...AFFICHE_URLS,
   ].join("\n");
 
   return message;

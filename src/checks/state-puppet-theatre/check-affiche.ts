@@ -1,14 +1,22 @@
-import { AFFICHE_URL } from "./constants";
+import { AFFICHE_URLS } from "./constants";
 
 /**
- * Fetches the theatre schedule page and extracts the visible text content
+ * Fetches the theatre schedule pages and extracts the visible text content
  * of elements that have a `data-m` attribute (months with available tickets).
  *
  * For now, this function is used to build a message for the Telegram bot,
  * not to make a strict boolean "available / not available" decision.
  */
 export async function checkAffiche(): Promise<Set<string>> {
-  const response = await fetch(AFFICHE_URL, {
+  const monthsPerUrl = await Promise.all(
+    AFFICHE_URLS.map((url) => fetchAfficheMonths(url)),
+  );
+
+  return new Set(monthsPerUrl.flat());
+}
+
+async function fetchAfficheMonths(url: string): Promise<string[]> {
+  const response = await fetch(url, {
     headers: {
       // Some sites behave differently without a User-Agent; set a reasonable one.
       "User-Agent":
@@ -18,13 +26,16 @@ export async function checkAffiche(): Promise<Set<string>> {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to fetch "${AFFICHE_URL}", status ${response.status}`);
+    throw new Error(`Failed to fetch "${url}", status ${response.status}`);
   }
 
-  let html = await response.text();
+  const html = await response.text();
+  return extractMonthsFromHtml(html);
+}
 
+function extractMonthsFromHtml(html: string): string[] {
   // Remove HTML comments BEFORE parsing
-  html = html.replace(/<!--[\s\S]*?-->/g, "");
+  const cleaned = html.replace(/<!--[\s\S]*?-->/g, "");
 
   // Very small HTML parser for this specific case:
   // find tags with a data-m attribute and grab their inner text.
@@ -33,7 +44,7 @@ export async function checkAffiche(): Promise<Set<string>> {
   const tagWithDataM =
     /<([a-zA-Z0-9]+)([^>]*\sdata-m(?:\s*=\s*("[^"]*"|'[^']*'|[^\s>]+))[^>]*)>([\s\S]*?)<\/\1>/gi;
 
-  let match: RegExpExecArray | null = tagWithDataM.exec(html);
+  let match: RegExpExecArray | null = tagWithDataM.exec(cleaned);
   while (match !== null) {
     const rawInner = match[4] ?? "";
 
@@ -47,9 +58,8 @@ export async function checkAffiche(): Promise<Set<string>> {
       results.push(text);
     }
 
-    match = tagWithDataM.exec(html);
+    match = tagWithDataM.exec(cleaned);
   }
 
-  const months = new Set(results);
-  return months;
+  return results;
 }
