@@ -8,8 +8,8 @@ import { saveAffiche } from "./save-affiche";
 
 export async function checkStatePuppetTheatre() {
   try {
-    const subscribedChatIds = await subscriptionsDB.getAll();
-    if (subscribedChatIds.length === 0) {
+    const subscribers = await subscriptionsDB.getAll();
+    if (subscribers.length === 0) {
       return;
     }
 
@@ -21,7 +21,7 @@ export async function checkStatePuppetTheatre() {
         ...errorLines,
       ].join("\n");
 
-      for (const chatId of subscribedChatIds) {
+      for (const { chatId } of subscribers) {
         await botHandler.sendMessage(chatId, message);
       }
 
@@ -39,7 +39,11 @@ export async function checkStatePuppetTheatre() {
     const newMonthsSet = getSetDifference(savedMonthsSet, availableMonthsSet);
 
     if (!newMonthsSet.size) {
-      for (const chatId of subscribedChatIds) {
+      for (const { chatId, verbose } of subscribers) {
+        if (!verbose) {
+          continue;
+        }
+
         await botHandler.sendMessage(
           chatId,
           `Новых билетов не обнаружено.\nПрошлая проверка:\n${savedMonths.join("\n")}`,
@@ -56,7 +60,7 @@ export async function checkStatePuppetTheatre() {
     const newMonths = Array.from(newMonthsSet);
     const foundMessage = prepareFoundMessage(newMonths);
 
-    for (const chatId of subscribedChatIds) {
+    for (const { chatId } of subscribers) {
       await botHandler.sendMessage(chatId, foundMessage);
     }
   } catch (error) {

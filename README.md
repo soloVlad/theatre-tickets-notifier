@@ -75,9 +75,10 @@ This will:
 
 ### Using the bot
 
-- **Start notifications**: In Telegram, start a chat with your bot and send `/start`.  
-- **Stop notifications**: Send `/stop`.  
-- **Check status**: Send `/status` to see whether the current chat is subscribed and what the check interval is.
+- **Start notifications**: In Telegram, start a chat with your bot and send `/start`. By default you only get messages when tickets are found or when every affiche URL fails.
+- **Verbose notifications**: Send `/verbose` to receive every check result, including “no new tickets”. Send `/quiet` to go back to important-only messages.
+- **Stop notifications**: Send `/stop`.
+- **Check status**: Send `/status` to see whether the current chat is subscribed, the notification mode, and the check interval.
 
 The bot will periodically run `checkTicketsAvailable()` and, if it returns `true`, send a notification message to all subscribed chats.
 
