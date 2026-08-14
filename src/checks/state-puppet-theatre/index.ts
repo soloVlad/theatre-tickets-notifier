@@ -13,7 +13,22 @@ export async function checkStatePuppetTheatre() {
       return;
     }
 
-    const availableMonthsSet = await checkAffiche();
+    const checkResult = await checkAffiche();
+    if (checkResult.status === "all_failed") {
+      const errorLines = checkResult.errors.map((error) => `• ${error}`);
+      const message = [
+        "⚠️ Не удалось проверить афишу Театра Кукол: все URL недоступны или вернули ошибку.",
+        ...errorLines,
+      ].join("\n");
+
+      for (const chatId of subscribedChatIds) {
+        await botHandler.sendMessage(chatId, message);
+      }
+
+      return;
+    }
+
+    const availableMonthsSet = checkResult.months;
     if (availableMonthsSet.size === 0) {
       return;
     }

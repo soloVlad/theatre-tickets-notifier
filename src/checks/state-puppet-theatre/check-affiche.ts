@@ -1,18 +1,44 @@
 import { AFFICHE_URLS } from "./constants";
 
+export type CheckAfficheResult =
+  | { status: "ok"; months: Set<string> }
+  | { status: "all_failed"; errors: string[] };
+
 /**
  * Fetches the theatre schedule pages and extracts the visible text content
  * of elements that have a `data-m` attribute (months with available tickets).
  *
- * For now, this function is used to build a message for the Telegram bot,
- * not to make a strict boolean "available / not available" decision.
+ * Individual URL failures are logged and skipped; other URLs are still checked.
+ * If every URL fails, returns `{ status: "all_failed" }`.
  */
-export async function checkAffiche(): Promise<Set<string>> {
-  const monthsPerUrl = await Promise.all(
+export async function checkAffiche(): Promise<CheckAfficheResult> {
+  const settled = await Promise.allSettled(
     AFFICHE_URLS.map((url) => fetchAfficheMonths(url)),
   );
 
-  return new Set(monthsPerUrl.flat());
+  const months: string[] = [];
+  const errors: string[] = [];
+
+  settled.forEach((result, index) => {
+    const url = AFFICHE_URLS[index];
+    if (result.status === "fulfilled") {
+      months.push(...result.value);
+      return;
+    }
+
+    const reason =
+      result.reason instanceof Error
+        ? result.reason.message
+        : String(result.reason);
+    console.error(`Failed to check affiche URL "${url}":`, result.reason);
+    errors.push(`${url}: ${reason}`);
+  });
+
+  if (errors.length === AFFICHE_URLS.length) {
+    return { status: "all_failed", errors };
+  }
+
+  return { status: "ok", months: new Set(months) };
 }
 
 async function fetchAfficheMonths(url: string): Promise<string[]> {
