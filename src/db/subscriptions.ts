@@ -10,12 +10,12 @@ async function ensureSchema(): Promise<void> {
     CREATE TABLE IF NOT EXISTS chat_subscriptions (
       chat_id BIGINT PRIMARY KEY,
       subscribed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      verbose BOOLEAN NOT NULL DEFAULT FALSE
+      is_verbose BOOLEAN NOT NULL DEFAULT FALSE
     )
   `);
   await pool.query(`
     ALTER TABLE chat_subscriptions
-      ADD COLUMN IF NOT EXISTS verbose BOOLEAN NOT NULL DEFAULT FALSE
+      ADD COLUMN IF NOT EXISTS is_verbose BOOLEAN NOT NULL DEFAULT FALSE
   `);
 }
 
@@ -35,8 +35,8 @@ async function remove(chatId: number): Promise<void> {
 }
 
 async function getByChatId(chatId: number): Promise<ChatSubscription | null> {
-  const result = await pool.query<{ chat_id: string | number; verbose: boolean }>(
-    "SELECT chat_id, verbose FROM chat_subscriptions WHERE chat_id = $1",
+  const result = await pool.query<{ chat_id: string | number; is_verbose: boolean }>(
+    "SELECT chat_id, is_verbose FROM chat_subscriptions WHERE chat_id = $1",
     [chatId],
   );
   const row = result.rows[0];
@@ -45,25 +45,25 @@ async function getByChatId(chatId: number): Promise<ChatSubscription | null> {
   }
   return {
     chatId: Number(row.chat_id),
-    verbose: row.verbose,
+    verbose: row.is_verbose,
   };
 }
 
 async function getAll(): Promise<ChatSubscription[]> {
-  const result = await pool.query<{ chat_id: string | number; verbose: boolean }>(
-    "SELECT chat_id, verbose FROM chat_subscriptions",
+  const result = await pool.query<{ chat_id: string | number; is_verbose: boolean }>(
+    "SELECT chat_id, is_verbose FROM chat_subscriptions",
   );
   return result.rows.map((row) => ({
     chatId: Number(row.chat_id),
-    verbose: row.verbose,
+    verbose: row.is_verbose,
   }));
 }
 
 async function setVerbose(chatId: number, verbose: boolean): Promise<boolean> {
-  const result = await pool.query("UPDATE chat_subscriptions SET verbose = $2 WHERE chat_id = $1", [
-    chatId,
-    verbose,
-  ]);
+  const result = await pool.query(
+    "UPDATE chat_subscriptions SET is_verbose = $2 WHERE chat_id = $1",
+    [chatId, verbose],
+  );
   return result.rowCount !== null && result.rowCount > 0;
 }
 
